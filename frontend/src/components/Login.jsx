@@ -1,15 +1,41 @@
 import React, { useState } from 'react';
 import googleIcon from '../assets/icon.jpeg';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setAuthUser } from '../redux/userSlice';
 
 function Login() {
   const [user, setUser] = useState({
     username: "",
     password: ""
   });
+  // hook for navigation
+  const navigate = useNavigate();
+  const dispatch=useDispatch()
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log(user);
+    try {
+      const res = await axios.post(`http://localhost:8080/api/v1/user/login`, user, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+
+
+      navigate("/");
+      //console.log(res);
+      dispatch(setAuthUser(user))
+
+
+
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error(error);
+    }
     setUser({
       username: "",
       password: "",
